@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/', indexRouter);
 
 app.use((req, res, next) => {
-  const error = new Error(`${req.method} ${req.url} No doesn't exitst`);
+  const error = new Error(`${req.method} ${req.url} Router doesn't exists`);
   error.status = 404;
   next(error);
 });
