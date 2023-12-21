@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const nunjucks = require('nunjucks');
+const hpp = require('hpp');
 dotenv.config();
 
 const indexRouter = require('./routes/index');

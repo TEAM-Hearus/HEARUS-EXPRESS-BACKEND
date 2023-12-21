@@ -9,7 +9,6 @@ ENV PORT=3000
 VOLUME ["/app"]
 
 RUN npm install
-RUN npm build
-
 EXPOSE $PORT
-ENTRYPOINT [ "npm", "run", "production" ]
+
+ENTRYPOINT [ "npx", "pm2-runtime", "start", "ecosystem.config.js" ]
