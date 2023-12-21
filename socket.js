@@ -13,10 +13,15 @@ function initSocket(server, app) {
     io.on('connection', (clientSocket) => {
         console.log('Socket Client connected');
 
+        clientSocket.on('clientData', (data) => {
+            console.log('Data from client ' + data);
+        });
+
         clientSocket.on('audioData', (data) => {
+            console.log(data);
             // Buffer Data to Audio
             text = data;
-            // Speech top Text Logic
+            // Speech To Text Logic
             const recognitionResult = text;
             clientSocket.emit('recognitionResult', recognitionResult);
         });
