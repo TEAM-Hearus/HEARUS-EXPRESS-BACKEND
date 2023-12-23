@@ -7,12 +7,15 @@
     "production": "pm2 start ecosystem.config.js"
   },
   "dependencies": {
+    "axios": "^1.6.2",
     "cookie-parser": "~1.4.4",
     "cross-env": "^7.0.3",
     "csurf": "^1.11.0",
     "debug": "~2.6.9",
     "dotenv": "^16.3.1",
     "express": "~4.16.1",
+    "form-data": "^4.0.0",
+    "fs": "^0.0.1-security",
     "helmet": "^7.1.0",
     "hpp": "^0.2.3",
     "http-errors": "~1.6.3",
@@ -23,6 +26,7 @@
     "pug": "2.0.0-beta11",
     "sanitize-html": "^2.11.0",
     "socket.io": "^3.1.2",
+    "uuid": "^9.0.1",
     "winston": "^3.11.0"
   }
 }
