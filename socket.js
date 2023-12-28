@@ -2,6 +2,7 @@ const socketIO = require('socket.io');
 const Queue = require('better-queue');
 
 const processAudioData = require("./processAudioData");
+const processNLText = require("./processNLText");
 
 function initSocket(server, app) {
     console.log('Configuring Socket');
@@ -26,8 +27,18 @@ function initSocket(server, app) {
                 .catch(err => done(err));
         }, { concurrent: 1 });
 
-        clientSocket.on('audioData', async (audioBlob) => {
+        const nlpQueue = new Queue((task, done) => {
+            processNLText(task.clientSocket, task.textData)
+                .then(() => done())
+                .catch(err => done(err));
+        }, { concurrent: 1 });
+
+        clientSocket.on('transcription', async (audioBlob) => {
             audioQueue.push({ clientSocket, audioBlob });
+        });
+
+        clientSocket.on('nlProcessing', async (textData) => {
+            nlpQueue.push({ clientSocket, textData });
         });
 
         clientSocket.on('disconnect', () => {

@@ -8,7 +8,12 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-async function convertToWav(inputFilePath, outputFilePath) {
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function convertToWav(inputFilePath, outputFilePath) {
+    console.log("convertToWav : " + inputFilePath);
     return new Promise((resolve, reject) => {
         ffmpeg(inputFilePath)
             .toFormat('wav')
@@ -17,7 +22,6 @@ async function convertToWav(inputFilePath, outputFilePath) {
                 resolve(outputFilePath);
             })
             .on('error', (err) => {
-                console.error('Error:', err);
                 reject(err);
             })
             .save(outputFilePath);
@@ -26,17 +30,21 @@ async function convertToWav(inputFilePath, outputFilePath) {
 
 function processAudioData(clientSocket, audioBlob) {
     return new Promise(async (resolve, reject) => {
-        const tempInputPath = `./temp/${uuidv4()}.webm`;
-        const tempOutputPath = `./temp/${uuidv4()}.wav`;
+        const uuidString = uuidv4();
+        const tempInputPath = `./temp/${uuidString}.webm`;
+        const tempOutputPath = `./temp/${uuidString}.wav`;
 
         try {
-            fs.writeFileSync(tempInputPath, audioBlob);
+            // Force fs.writefile to Sync
+            const buffer = Buffer.from(audioBlob);
+            await fs.promises.writeFile(tempInputPath, buffer);
+            console.log(tempInputPath);
             await convertToWav(tempInputPath, tempOutputPath);
 
             const form = new FormData();
             form.append('audio', fs.createReadStream(tempOutputPath));
 
-            const response = await axios.post('http://127.0.0.1:5001/transcribe', form, { headers: form.getHeaders() });
+            const response = await axios.post(process.env.FLASK_HOST + '/transcribe', form, { headers: form.getHeaders() });
 
             console.log("Transcription result : " + response.data);
             clientSocket.emit('recognitionResult', response.data);
@@ -47,7 +55,7 @@ function processAudioData(clientSocket, audioBlob) {
         } catch (error) {
             if (fs.existsSync(tempInputPath)) fs.unlinkSync(tempInputPath);
             if (fs.existsSync(tempOutputPath)) fs.unlinkSync(tempOutputPath);
-            console.error('Error in transcription:', error);
+            console.error('Error in transcription ', error);
             reject(error);
         }
     });
