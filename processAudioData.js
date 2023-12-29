@@ -18,7 +18,7 @@ function convertToWav(inputFilePath, outputFilePath) {
         ffmpeg(inputFilePath)
             .toFormat('wav')
             .on('end', () => {
-                console.log('Conversion Finished');
+                // console.log('Conversion Finished');
                 resolve(outputFilePath);
             })
             .on('error', (err) => {
@@ -38,7 +38,7 @@ function processAudioData(clientSocket, audioBlob) {
             // Force fs.writefile to Sync
             const buffer = Buffer.from(audioBlob);
             await fs.promises.writeFile(tempInputPath, buffer);
-            console.log(tempInputPath);
+            // console.log(tempInputPath);
             await convertToWav(tempInputPath, tempOutputPath);
 
             const form = new FormData();
