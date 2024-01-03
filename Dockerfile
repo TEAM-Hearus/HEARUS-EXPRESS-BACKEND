@@ -1,8 +1,8 @@
 FROM node:lts-alpine as build-stage
 
 WORKDIR /app
-RUN mkdir /temp
 COPY . .
+RUN mkdir /temp
 
 ENV NODE_ENV=production
 ENV PORT=3000
