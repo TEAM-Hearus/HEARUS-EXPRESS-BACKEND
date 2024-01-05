@@ -7,6 +7,7 @@ const processNLText = require("./processNLText");
 function initSocket(server, app) {
     console.log('Configuring Socket');
     const io = socketIO(server, {
+        path: '/socket',
         cors: {
             credentials: true,
         },
