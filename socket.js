@@ -8,6 +8,9 @@ function initSocket(server, app) {
     console.log('Configuring Socket');
     const io = socketIO(server, {
         path: '/socket',
+        // Connection Timeout
+        // Only for previous connection
+        pingTimeout: 10000,
         cors: {
             credentials: true,
         },
