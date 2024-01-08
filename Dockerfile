@@ -13,4 +13,4 @@ RUN npm install
 EXPOSE $PORT
 
 # ENTRYPOINT [ "npx", "pm2-runtime", "start", "ecosystem.config.js" ]
-ENTRYPOINT ["node", "app.js"]
+ENTRYPOINT ["npm", "start"]
