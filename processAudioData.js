@@ -46,8 +46,10 @@ function processAudioData(clientSocket, audioBlob) {
 
             const response = await axios.post(process.env.FLASK_HOST + '/transcribe', form, { headers: form.getHeaders() });
 
-            console.log("Transcription result : " + response.data);
-            clientSocket.emit('recognitionResult', response.data);
+            if (response.data.length <= 50) {
+                console.log("Transcription result : " + response.data);
+                clientSocket.emit('recognitionResult', response.data);
+            }
 
             fs.unlinkSync(tempInputPath);
             fs.unlinkSync(tempOutputPath);
