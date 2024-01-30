@@ -7,27 +7,35 @@ const openai = new OpenAI({
 
 async function callGPTApi(keyword) {
     const prompt =
-        `대한민국 대학교 강의에서 ${keyword}의 의미와 ` +
-        `학생들을 학습을 도와줄 수 있는 부가 정보에 대해 128자 이내로 답변해줘`;
+        `대한민국 대학교 강의에서 ${keyword}의 사전적 의미를 128자 이내로 답변해줘`;
 
-    const chatCompletion = await openai.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'gpt-3.5-turbo-1106',
-    });
+    try {
+        const chatCompletion = await openai.chat.completions.create({
+            messages: [{ role: 'user', content: prompt }],
+            model: 'gpt-3.5-turbo',
+        });
 
-    return chatCompletion.data.choices[0].text.trim();
+        console.log(chatCompletion.choices[0].message);
+        if (chatCompletion && chatCompletion.choices) {
+            return chatCompletion.choices[0].message.content;
+        } else {
+            console.error('Invalid response structure:', chatCompletion);
+            return 'Error: Invalid response structure';
+        }
+    } catch (error) {
+        console.error('Error in API call:', error);
+        return `Error: ${error.message}`;
+    }
 }
 
 function processNLText(clientSocket, textData) {
     return new Promise(async (resolve, reject) => {
         try {
-            console.log(callGPTApi("관성"));
             const response = await axios.post(
                 process.env.FLASK_HOST + '/process',
                 textData,
                 { headers: { 'Content-Type': 'application/json' } }
             );
-
 
             const nlpResponse = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
             const unProcessedText = nlpResponse.unProcessedText;
