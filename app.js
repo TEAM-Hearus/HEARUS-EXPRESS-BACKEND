@@ -10,6 +10,7 @@ dotenv.config();
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
+const lectureRouter = require('./routes/lecture');
 
 const app = express();
 
@@ -61,6 +62,8 @@ initSocket(server, app);
 // Set Router
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/lecture', lectureRouter);
+
 
 // Page not found handler
 app.use((req, res, next) => {
