@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 dotenv.config();
 
 const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
 
 const app = express();
 
@@ -51,14 +52,15 @@ mongoose.connect(uri, {
 }).catch(err => console.log(err.reason))
   .then(console.log("MongoDB Connected"));
 
-// Set Router
-app.use('/', indexRouter);
-
 //Set Socket
 const initSocket = require('./socket');
 const http = require('http');
 const server = http.createServer(app);
 initSocket(server, app);
+
+// Set Router
+app.use('/', indexRouter);
+app.use('/auth', authRouter);
 
 // Page not found handler
 app.use((req, res, next) => {
