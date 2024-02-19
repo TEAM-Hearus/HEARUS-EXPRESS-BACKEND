@@ -12,7 +12,7 @@ exports.signup = async (req, res, next) => {
     try {
         const exUser = await User.findOne({ email: email });
         if (exUser)
-            return res.status(409).json({ status: "fail", message: "User already exists" });
+            return res.status(409).json({ status: "fail", message: "User Already Exists" });
 
         // Hash password
         const salt = await bycrpt.genSalt(10);
@@ -25,7 +25,7 @@ exports.signup = async (req, res, next) => {
         });
         await newUser.save();
 
-        return res.status(201).json({ status: "success", message: "Signup success" });
+        return res.status(201).json({ status: "success", message: "Signup Success" });
     } catch (error) {
         console.error(error);
         return next(error);
@@ -41,30 +41,30 @@ exports.login = async (req, res, next) => {
 
     // OAuth
     if (isOAuth)
-        return res.status(405).json({ status: "fail", message: "OAuth not implemented" });
+        return res.status(405).json({ status: "fail", message: "OAuth not Implemented" });
 
     try {
         // Find User
         const exUser = await User.findOne({ email: email });
         if (!exUser)
-            return res.status(401).json({ status: "fail", message: "Unknown user" });
+            return res.status(401).json({ status: "fail", message: "Unknown User" });
 
         // Match password
         const matchPW = await bycrpt.compare(password, exUser.password);
         if (!matchPW)
-            return res.status(401).json({ status: "fail", message: "Wrong password" });
+            return res.status(401).json({ status: "fail", message: "Wrong Password" });
 
         // Certify Tokens
-        const accessToken = jwt.sign({ userID: exUser._id }, process.env.JWT_SECRET, {
+        const accessToken = jwt.sign({ userID: exUser._id }, process.env.JWT_ACCESS_SECRET, {
             expiresIn: '1h',
         });
-        const refreshToken = jwt.sign({ userID: exUser._id }, process.env.JWT_SECRET, {
+        const refreshToken = jwt.sign({ userID: exUser._id }, process.env.JWT_REFRESH_SECRET, {
             expiresIn: '24h',
         });
 
         return res.status(201).json({
             status: "success",
-            message: "Login success",
+            message: "Login Success",
             accessToken: accessToken,
             refreshToken: refreshToken,
         });
@@ -77,7 +77,7 @@ exports.login = async (req, res, next) => {
 exports.renewAccessToken = async (req, res, next) => {
     try {
         // Renew Access Token
-        const accessToken = jwt.sign({ userID: req.userID }, process.env.JWT_SECRET, {
+        const accessToken = jwt.sign({ userID: req.userID }, process.env.JWT_ACCESS_SECRET, {
             expiresIn: '1h',
         });
 

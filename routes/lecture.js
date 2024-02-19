@@ -1,11 +1,8 @@
-const { verifyToken } = require('../middlewares/jwtToken');
 var express = require('express');
-
-const {
-    renderLecture
-} = require('../controllers/lecture');
+const { verifyAccessToken } = require('../middlewares/jwtToken');
+const { renderLecture } = require('../controllers/lecture');
 var router = express.Router();
 
-router.get('/', verifyToken, renderLecture);
+router.get('/', verifyAccessToken, renderLecture);
 
 module.exports = router;
