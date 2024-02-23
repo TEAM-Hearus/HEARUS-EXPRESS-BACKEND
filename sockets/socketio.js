@@ -1,7 +1,6 @@
 const socketIO = require('socket.io');
 const Queue = require('better-queue');
 
-const processAudioData = require("./processAudioData");
 const processNLText = require("./processNLText");
 const wsManager = require('./webSocketManager');
 
@@ -20,7 +19,7 @@ function initSocket(server, app) {
 
     // Configure FE Socket.io
     // FE Client 데이터를 관리할 필요가 있어 Socket.io 사용
-    console.log('Configuring FE Socket.io');
+    console.log('[Socket.io] Configuring FE Socket.io');
     const io = socketIO(server, {
         // Connection Timeout
         // Only for previous connection
@@ -39,7 +38,10 @@ function initSocket(server, app) {
 
     // FE socket.io connection
     io.on('connection', (clientSocket) => {
-        console.log('FE Client [' + clientSocket.handshake.headers.origin + '] Socket.io Connected');
+        console.log('[Socket.io] FE Client [' + clientSocket.handshake.headers.origin + '] Socket.io Connected');
+
+        // Set ClientSocket into Web Socket Manager
+        wsManager.setClientSocket(clientSocket)
 
         const nlpQueue = new Queue((task, done) => {
             processNLText(task.clientSocket, task.textData)
@@ -48,7 +50,8 @@ function initSocket(server, app) {
         }, { concurrent: 1 });
 
         clientSocket.on('transcription', async (audioBlob) => {
-            processAudioData(clientSocket, audioBlob);
+            // wsManager를 통해 FastAPI에 audioBlob 데이터 전송
+            wsManager.sendAudioData(audioBlob);
         });
 
         clientSocket.on('nlProcessing', async (textData) => {
@@ -56,7 +59,7 @@ function initSocket(server, app) {
         });
 
         clientSocket.on('disconnect', () => {
-            console.log('FE Client [' + clientSocket.handshake.headers.origin + '] Socket.io disconnected');
+            console.log('[Socket.io] FE Client [' + clientSocket.handshake.headers.origin + '] Socket.io disconnected');
         });
     });
 }

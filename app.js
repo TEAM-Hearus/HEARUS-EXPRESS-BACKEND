@@ -51,7 +51,7 @@ const uri = 'mongodb+srv://' +
 mongoose.connect(uri, {
   serverSelectionTimeoutMS: 5000
 }).catch(err => console.log(err.reason))
-  .then(console.log("MongoDB Connected"));
+  .then(console.log("[Express Server] MongoDB Connected"));
 
 //Set Socket
 const initSocket = require('./sockets/socketio');
@@ -82,7 +82,7 @@ app.use((err, req, res, next) => {
 });
 
 server.listen(app.get('port'), () => {
-  console.log('Server is listening at ', app.get('port'));
+  console.log('[Express Server] Server is listening at ', app.get('port'));
 });
 
 module.exports = app;
