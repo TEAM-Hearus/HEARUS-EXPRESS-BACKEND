@@ -51,7 +51,7 @@ function initSocket(server, app) {
 
         clientSocket.on('transcription', async (audioBlob) => {
             // wsManager를 통해 FastAPI에 audioBlob 데이터 전송
-            wsManager.sendAudioData(audioBlob);
+            wsManager.transcribeBufferAndSend(audioBlob);
         });
 
         clientSocket.on('nlProcessing', async (textData) => {

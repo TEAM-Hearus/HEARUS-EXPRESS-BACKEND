@@ -1,4 +1,6 @@
 const WebSocket = require('ws');
+const ffmpeg = require('fluent-ffmpeg');
+const stream = require('stream');
 
 // WebSocket Connection
 class WebSocketManager {
@@ -48,8 +50,44 @@ class WebSocketManager {
         });
     }
 
-    sendAudioData(audioBlob) {
-        this.socket.send(audioBlob);
+    // 메모리 내 버퍼 데이터를 PCM 형식으로 변환
+    // 이후 WebSocket을 통해 전달
+    transcribeBufferAndSend(bufferData) {
+        try {
+            const self = this;
+
+            const readableStream = new stream.PassThrough();
+            // 스트림에 버퍼 데이터 전달 및 종료
+            readableStream.end(bufferData);
+
+            let buffers = [];
+            const command = ffmpeg(readableStream)
+                .inputFormat('webm')
+                .audioCodec('pcm_s16le')
+                .audioFrequency(16000)
+                .audioChannels(1)
+                .format('s16le')
+                .on('error', (err) => {
+                    console.error('An error occurred: ' + err.message);
+                })
+                .on('end', () => {
+                    // 수집된 데이터 청크를 하나의 버퍼로
+                    const audioData = Buffer.concat(buffers);
+                    if (self.socket.readyState === WebSocket.OPEN) {
+                        // 합쳐진 버퍼 데이터를 WebSocket을 통해 전송
+                        self.socket.send(audioData);
+                    }
+                });
+
+            command.pipe(new stream.Writable({
+                write(chunk, encoding, callback) {
+                    buffers.push(chunk);
+                    callback();
+                }
+            }));
+        } catch (error) {
+            console.error('Error during audio processing:', error);
+        }
     }
 
     getSocket() {
