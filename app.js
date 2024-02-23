@@ -54,7 +54,7 @@ mongoose.connect(uri, {
   .then(console.log("MongoDB Connected"));
 
 //Set Socket
-const initSocket = require('./socket');
+const initSocket = require('./sockets/socketio');
 const http = require('http');
 const server = http.createServer(app);
 initSocket(server, app);
