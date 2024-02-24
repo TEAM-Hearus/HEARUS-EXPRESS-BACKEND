@@ -31,10 +31,10 @@ class WebSocketManager {
             self.socket.send(token);
         });
 
-        // Transition Result 이후 Client Socket으로 전송
-        this.socket.on('transitionResult', (result) => {
-            console.log("[WebSocket] Transition Result" + result);
-            self.clientSocket.emit('transitionResult', result);
+        // message를 받으면 Client Socket으로 전송
+        this.socket.on('message', (result) => {
+            console.log("[WebSocket] Transition Result : " + result);
+            self.clientSocket.emit('transitionResult', result.toString());
         });
 
         this.socket.on('close', function close() {
