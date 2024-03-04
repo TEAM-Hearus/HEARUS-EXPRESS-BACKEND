@@ -9,7 +9,7 @@ class WebSocketManager {
         this.clientSocket = null;
     }
 
-    // Set Fe Client Socket.io
+    // Set FE Client Socket.io
     setClientSocket(clientSocket) {
         console.log("[WebSocket] WebSocketManager Client Socket Configured");
         this.clientSocket = clientSocket;
